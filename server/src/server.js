@@ -23,7 +23,16 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin: (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((value) => value.trim()), credentials: true }));
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://edunexa-u34x.onrender.com",
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: 'draft-7', legacyHeaders: false }));
 
 if (process.env.CLERK_SECRET_KEY) {
